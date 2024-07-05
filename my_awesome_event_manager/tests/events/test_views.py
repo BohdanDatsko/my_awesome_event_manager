@@ -1,3 +1,4 @@
+from dateutil.parser import parse
 from django.urls import reverse
 from rest_framework import status
 
@@ -20,6 +21,93 @@ class EventListCreateTest(BaseAPITestCase):
         response = self.client.get(self.url, **self.auth_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotEqual(response.json().get("results"), [])
+
+    def test_list_events_with_date_filter(self):
+        # Create events with different dates
+        EventFactory(organizer=self.organizer, date="2024-07-07")
+        EventFactory(organizer=self.organizer, date="2024-07-08")
+
+        def test_date_filter(date_str, expected_date):
+            # Test filtering by date
+            response = self.client.get(
+                self.url + "?date=" + date_str,
+                **self.auth_headers,
+            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(response.json().get("results")), 1)
+            response_date = parse(response.json().get("results")[0].get("date")).date()
+            self.assertEqual(response_date.isoformat(), expected_date)
+
+        test_date_filter("2024-07-07", "2024-07-07")
+        test_date_filter("July 7, 2024", "2024-07-07")
+
+    def test_list_events_with_search_filter(self):
+        # Create events with different titles and locations
+        EventFactory(
+            organizer=self.organizer,
+            title="Test Event 1",
+            location="Location 1",
+        )
+        EventFactory(
+            organizer=self.organizer,
+            title="Test Event 2",
+            location="Location 2",
+        )
+
+        # Test searching by title
+        response = self.client.get(self.url + "?search=Event 1", **self.auth_headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.json().get("results")), 1)
+        self.assertEqual(response.json().get("results")[0].get("title"), "Test Event 1")
+
+        # Test searching by location
+        response = self.client.get(self.url + "?search=Location 2", **self.auth_headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.json().get("results")), 1)
+        self.assertEqual(
+            response.json().get("results")[0].get("location"),
+            "Location 2",
+        )
+
+    def test_list_events_with_date_and_search_filters(self):
+        # Create events with different dates, titles, and locations
+        EventFactory(
+            organizer=self.organizer,
+            date="2024-07-07",
+            title="Test Event 1",
+            location="Location 1",
+        )
+        EventFactory(
+            organizer=self.organizer,
+            date="2024-07-08",
+            title="Test Event 2",
+            location="Location 2",
+        )
+
+        # Test filtering by date and searching by title
+        response = self.client.get(
+            self.url + "?date=2024-07-07&search=Event 1",
+            **self.auth_headers,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.json().get("results")), 1)
+        self.assertEqual(response.json().get("results")[0].get("title"), "Test Event 1")
+        response_date = parse(response.json().get("results")[0].get("date")).date()
+        self.assertEqual(response_date.isoformat(), "2024-07-07")
+
+        # Test filtering by date and searching by location
+        response = self.client.get(
+            self.url + "?date=2024-07-08&search=Location 2",
+            **self.auth_headers,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.json().get("results")), 1)
+        self.assertEqual(
+            response.json().get("results")[0].get("location"),
+            "Location 2",
+        )
+        response_date = parse(response.json().get("results")[0].get("date")).date()
+        self.assertEqual(response_date.isoformat(), "2024-07-08")
 
     def test_list_events_forbidden(self):
         response = self.client.get(self.url, **self.fake_auth_headers)

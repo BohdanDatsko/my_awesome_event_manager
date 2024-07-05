@@ -64,6 +64,7 @@ class EventCompactSerializer(serializers.ModelSerializer):
         fields = (
             "event_id",
             "title",
+            "location",
             "date",
             "organizer",
         )

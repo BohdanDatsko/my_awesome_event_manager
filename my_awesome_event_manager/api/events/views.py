@@ -1,4 +1,6 @@
+from dateutil.parser import parse
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from drf_spectacular.utils import extend_schema
 
 from my_awesome_event_manager.api.events.mixins import EventGetUpdateDeleteMixin
@@ -21,6 +23,9 @@ class EventListCreateView(EventListCreateMixin):
     ---
     get:
         Get multiple events.
+
+        :param search: Search by title or location.
+        :param date: Filter by date.
 
         Returns the compact event records for some filtered set of events.
         Use one or more of the parameters provided to filter the events returned.
@@ -47,8 +52,27 @@ class EventListCreateView(EventListCreateMixin):
     def get_serializer_class(self):
         return self.serializer_classes.get(self.action, self.serializer_class)
 
+    def parse_date(self, date_str):
+        try:
+            return parse(date_str).date()
+        except ValueError:
+            return None
+
     def get_queryset(self):
-        return super().get_queryset().select_related("organizer")
+        queryset = super().get_queryset().select_related("organizer")
+        search = self.request.GET.get("search", None)
+        date_str = self.request.GET.get("date", None)
+
+        if date_str is not None:
+            date = self.parse_date(date_str)
+            if date is not None:
+                queryset = queryset.filter(date=date)
+
+        if search is not None:
+            queryset = queryset.filter(
+                Q(title__icontains=search) | Q(location__icontains=search),
+            )
+        return queryset
 
     @extend_schema(tags=["Events API"], operation_id="events_get")
     def get(self, request, *args, **kwargs):
