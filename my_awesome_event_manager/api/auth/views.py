@@ -6,9 +6,11 @@ from django.contrib.auth import get_user_model, login
 from django.utils.decorators import method_decorator
 from django.views.decorators.debug import sensitive_post_parameters
 from drf_spectacular.utils import extend_schema
-from rest_framework import serializers
+from rest_framework import serializers, status
 from rest_framework.authtoken.models import Token
+from rest_framework.exceptions import ParseError
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 
 from my_awesome_event_manager.api.auth.mixins import LoginMixin, LogoutMixin
 
@@ -114,15 +116,24 @@ class UserRegisterView(RegisterView):
 
     @extend_schema(tags=["Auth API"], operation_id="signup")
     def post(self, request, *args, **kwargs):
+        if User.objects.filter(email=request.data["email"]).exists():
+            raise ParseError("User with this email already exists.")
         response = super().create(request, *args, **kwargs)
 
-        if response.status_code == 201:  # User successfully created
-            user = User.objects.get(username=request.data["username"])
-            login(request, user)  # Log the user in
+        if response.status_code == 204:  # User successfully created
+            user = User.objects.get(email=request.data["email"])
+            user.backend = "django.contrib.auth.backends.ModelBackend"
+            login(request, user)
 
-            # Create a token for the user and add it to the response
             token, created = Token.objects.get_or_create(user=user)
-            response.data["token"] = token.key
+            response_data = {
+                "user": {
+                    "user_id": user.user_id,
+                    "email": user.email,
+                },
+                "token": token.key,
+            }
+            return Response(response_data, status=status.HTTP_201_CREATED)
 
         return response
 

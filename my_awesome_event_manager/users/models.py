@@ -16,8 +16,6 @@ from my_awesome_event_manager.users.managers import UserManager
 class User(AbstractUser):
     """
     Default custom user model for My Awesome Event Manager.
-    If adding fields that need to be filled at user signup,
-    check forms.SignupForm and forms.SocialSignupForms accordingly.
     """
 
     # First and last name do not cover name patterns around the globe
@@ -45,7 +43,7 @@ class User(AbstractUser):
             str: URL for user detail.
 
         """
-        return reverse("api:user_by_id", kwargs={"user_id": self.user_id})
+        return reverse("api:users:user_by_id", kwargs={"user_id": self.user_id})
 
 
 # ----------------------------------------------------------------- #

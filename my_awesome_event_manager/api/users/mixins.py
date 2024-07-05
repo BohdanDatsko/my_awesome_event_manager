@@ -41,19 +41,5 @@ class UserMixin(ListModelMixin, RetrieveModelMixin, UpdateModelMixin, BaseMixin)
         )
 
 
-# ------------------------------------------------------ #
-# ------------------------------------------------------ #
-
-
-class UserUUIDMixin(RetrieveModelMixin, BaseMixin):
-    @calculate_api_time
-    def retrieve(self, request, *args, **kwargs):
-        response = super().retrieve(request, *args, **kwargs)
-        return Response(
-            self.get_results(results_count=1, results=response.data),
-            status=status.HTTP_200_OK,
-        )
-
-
 # ----------------------------------------------------------------------- #
 # ----------------------------------------------------------------------- #

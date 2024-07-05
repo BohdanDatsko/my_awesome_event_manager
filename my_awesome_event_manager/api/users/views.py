@@ -2,9 +2,12 @@ from django.contrib.auth import get_user_model
 from drf_spectacular.utils import extend_schema
 from rest_framework.permissions import IsAdminUser
 
-from my_awesome_event_manager.api.users.mixins import UserMixin, UserUUIDMixin
+from my_awesome_event_manager.api.users.mixins import UserMixin
 from my_awesome_event_manager.api.users.permissions import IsRequestUserOrAdmin
-from my_awesome_event_manager.api.users.serializers import UserCompactSerializer, UserSerializer, UserUUIDSerializer
+from my_awesome_event_manager.api.users.serializers import (
+    UserCompactSerializer,
+    UserSerializer,
+)
 
 User = get_user_model()
 
@@ -78,36 +81,6 @@ class UserGetUpdateView(UserMixin):
     @extend_schema(tags=["Users API"], operation_id="user_by_id_update")
     def put(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
-
-
-# ------------------------------------------------------------- #
-# ------------------------------------------------------------- #
-
-
-class UserUUIDView(UserUUIDMixin):
-    """
-    API endpoint get user's UUID.
-
-    ---
-    get:
-        Get user's UUID.
-
-        Returns the user's UUID.
-    """
-
-    model = User
-    queryset = User.objects.all()
-    serializer_class = UserUUIDSerializer
-
-    def get_object(self):
-        """
-        Returns the currently authenticated user.
-        """
-        return self.request.user
-
-    @extend_schema(tags=["Users API"], operation_id="get_user_uuid")
-    def get(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
 
 
 # ----------------------------------------------------------------------- #

@@ -25,14 +25,16 @@ services:
   postgres:
     build:
       context: .
-      dockerfile: ./compose/production/postgres/Dockerfile
-    image: my_awesome_event_manager_production_postgres:1.0.0
+      dockerfile: ./compose/local/postgres/Dockerfile
+    image: my_awesome_event_manager_local_postgres:1.0.0
     container_name: my_awesome_event_manager_local_postgres
     volumes:
       - my_awesome_event_manager_local_postgres_data:/var/lib/postgresql/data
       - my_awesome_event_manager_local_postgres_data_backups:/backups
     env_file:
       - ./.envs/.local/.postgres
+    ports:
+      - '5432:5432'
 
   redis:
     image: docker.io/redis:6

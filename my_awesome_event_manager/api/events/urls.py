@@ -6,7 +6,7 @@ from my_awesome_event_manager.api.auth.views import (
     LogoutView,
 )
 
-app_name = "auth"
+app_name = "events"
 
 # ----------------------------------------------------------------- #
 # ----------------------------------------------------------------- #
