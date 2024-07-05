@@ -46,12 +46,12 @@ pytest_delete_cache:
 	docker compose -f docker-compose.local.yml down --remove-orphans
 
 coverage:
-	@echo "Start local coverage"
+	@echo "Make coverage report"
 	docker compose -f docker-compose.local.yml run --rm django coverage run -m pytest
 	docker compose -f docker-compose.local.yml run --rm django coverage report
 
 coverage_html:
-	@echo "Start local coverage"
+	@echo "Make coverage HTML report"
 	docker compose -f docker-compose.local.yml run --rm django coverage run -m pytest
 	docker compose -f docker-compose.local.yml run --rm django coverage html
 	docker compose -f docker-compose.local.yml run --rm django open htmlcov/index.html
