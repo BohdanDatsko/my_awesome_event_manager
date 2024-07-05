@@ -50,6 +50,8 @@ coverage:
 	docker compose -f docker-compose.local.yml run --rm django coverage run -m pytest
 	docker compose -f docker-compose.local.yml run --rm django coverage report
 
-docs_server:
-	@echo "Start serving docs"
-	docker compose -f docker-compose.docs.yml up
+coverage_html:
+	@echo "Start local coverage"
+	docker compose -f docker-compose.local.yml run --rm django coverage run -m pytest
+	docker compose -f docker-compose.local.yml run --rm django coverage html
+	docker compose -f docker-compose.local.yml run --rm django open htmlcov/index.html

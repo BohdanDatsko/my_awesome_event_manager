@@ -4,10 +4,8 @@ from rest_framework.permissions import IsAdminUser
 
 from my_awesome_event_manager.api.users.mixins import UserMixin
 from my_awesome_event_manager.api.users.permissions import IsRequestUserOrAdmin
-from my_awesome_event_manager.api.users.serializers import (
-    UserCompactSerializer,
-    UserSerializer,
-)
+from my_awesome_event_manager.api.users.serializers import UserCompactSerializer
+from my_awesome_event_manager.api.users.serializers import UserSerializer
 
 User = get_user_model()
 
@@ -24,8 +22,8 @@ class UserListView(UserMixin):
     get:
         Get multiple users.
 
-        Returns the user records for all users in all workspaces accessible to the authenticated user.
-        Accepts an optional workspace ID parameter. Results are sorted by user ID.
+        Returns the user records for all users to the authenticated user.
+        Results are sorted by user ID.
     """
 
     model = User
@@ -52,19 +50,19 @@ class UserGetUpdateView(UserMixin):
     Reads and updates UserModel fields
     Accepts GET, PUT, PATCH methods.
 
-    Default accepted fields: username, first_name, last_name
-    Default display fields: pk, username, email, first_name, last_name
-    Read-only fields: pk, email
+    Default accepted fields: first_name, last_name
+    Default display fields: user_id, email, first_name, last_name
+    Read-only fields: user_id, email
 
     ---
     get:
         Get a user.
 
-        Returns the full user record for the single user with the provided ID. Results are sorted by user ID.
+        Returns the full user record for the single user with the provided UUID. Results are sorted by user ID.
     put:
         Update a user.
 
-        Returns the full updated user record for the single user with the provided ID.
+        Returns the full updated user record for the single user with the provided UUID.
     """
 
     model = User

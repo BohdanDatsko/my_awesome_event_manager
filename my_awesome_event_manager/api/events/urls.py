@@ -1,10 +1,7 @@
 from django.urls import path
 
-from my_awesome_event_manager.api.auth.views import (
-    UserRegisterView,
-    LoginView,
-    LogoutView,
-)
+from my_awesome_event_manager.api.events.views import EventGetUpdateDeleteView
+from my_awesome_event_manager.api.events.views import EventListCreateView
 
 app_name = "events"
 
@@ -16,13 +13,17 @@ app_name = "events"
 
 urlpatterns = [
     # URLs that do not require a session or valid token
-    path("signup/", UserRegisterView.as_view(), name="rest_register"),
-    path("login/", LoginView.as_view({"post": "post"}), name="rest_login"),
-    # URLs that require a user to be logged in with a valid session / token.
     path(
-        "logout/",
-        LogoutView.as_view({"get": "get", "post": "post"}),
-        name="rest_logout",
+        "",
+        EventListCreateView.as_view({"get": "get", "post": "post"}),
+        name="events",
+    ),
+    path(
+        "<uuid:event_id>/",
+        EventGetUpdateDeleteView.as_view(
+            {"get": "get", "put": "put", "delete": "delete"},
+        ),
+        name="event_by_id",
     ),
 ]
 

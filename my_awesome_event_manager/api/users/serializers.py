@@ -20,8 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {"email": {"required": True}}
 
     def to_representation(self, data):
-        res = super().to_representation(data)
-        return res
+        return super().to_representation(data)
 
 
 # ------------------------------------------------------------- #
@@ -33,42 +32,11 @@ class UserCompactSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             "user_id",
-            "first_name",
-            "last_name",
             "email",
         )
 
     def to_representation(self, data):
-        res = super().to_representation(data)
-        return res
-
-
-# ------------------------------------------------------------- #
-# ------------------------------------------------------------- #
-
-
-class UserUUIDSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ("user_id",)
-
-    def to_representation(self, data):
-        res = super().to_representation(data)
-        return res
-
-
-# ------------------------------------------------------------- #
-# ------------------------------------------------------------- #
-
-
-class UserEmailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ("email",)
-
-    def to_representation(self, data):
-        res = super().to_representation(data)
-        return res
+        return super().to_representation(data)
 
 
 # ----------------------------------------------------------------------- #
